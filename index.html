@@ -7,28 +7,56 @@
       src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js"
       defer
     ></script>
-    <style>
-        .active {color: blue;}
-    </style>
+    <link
+      href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
   </head>
-  <body>
-    <div x-data="{ currentTab: 'first' }">
-        <button @click="currentTab = 'first'" :class="{ 'active' : currentTab === 'first'}">First</button>
-        <button @click="currentTab = 'second'" :class="{ 'active' : currentTab === 'second'}">Second</button>
-        <button @click="currentTab = 'third'" :class="{ 'active' : currentTab === 'third'}">Third</button>
+  <body class="p-10 max-w-lg mx-auto">
+    <form
+      x-data="{
+        form: {
+          name: ''
+        },
 
-        <div style="border: 1px dotted gray; padding: 1rem; margin-top: 1rem;">
-            <div x-show="currentTab === 'first'">
-                <p>First tab.</p>
-            </div>
-            <div x-show="currentTab === 'second'">
-                <p>Second tab.</p>
-            </div>
-            <div x-show="currentTab === 'third'">
-                <p>Third tab.</p>
-            </div>
-        </div>
-    </div>
-    </div>
+        user: null,
+
+        submit() {
+          fetch('https://reqres.in/api/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.form)
+          })
+          .then(response => response.json())
+          .then(user => this.user = user);
+        }
+
+      }"
+      @submit.prevent="submit"
+    >
+      <div class="mb-6">
+        <label
+          for="name"
+          class="block mb-2 uppercase font-bold text-xs text-gray-700"
+        >
+          Name
+        </label>
+
+        <input
+          type="text"
+          class="border border-gray-400 p-2 w-full"
+          name="name"
+          id="name"
+          x-model="form.name"
+          required
+        />
+      </div>
+    </form>
+
+    <template x-if="user">
+      <div
+        x-text="'The user ' + user.name + ' was created at ' + user.createdAt"
+      ></div>
+    </template>
   </body>
 </html>
